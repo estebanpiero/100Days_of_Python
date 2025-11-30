@@ -94,11 +94,19 @@ while continue_program != False:
     # Printing Menu
 
     print("Menu:")
+    from prettytable import PrettyTable
+    table = PrettyTable()
+    table.field_names = ["Coffee", "Logo"]
+    
+
     for item in MENU:
         cost = MENU[item]["cost"]
-        print(f"{item.capitalize()}: ${cost}")
-        print(COFFEE_MACHINE_LOGO[item])
-
+        table.add_row([f"{item.capitalize()}: ${cost}", COFFEE_MACHINE_LOGO[item]])
+        #print(f"{item.capitalize()}: ${cost}")
+        #print(COFFEE_MACHINE_LOGO[item])
+    
+    print(table)
+    
     user_input = input("What would you like? (espresso/latte/cappuccino): ").lower()
     continue_program = coffe_machine(user_input)
 
