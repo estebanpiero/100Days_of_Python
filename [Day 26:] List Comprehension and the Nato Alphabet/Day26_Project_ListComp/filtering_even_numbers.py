@@ -1,0 +1,8 @@
+#Filtering Even Numbers using List Comprehension
+
+list_of_strings = ['9', '0', '32', '8', '2', '8', '64', '29', '42', '99']
+numbers = [int(number) for number in list_of_strings]
+
+#Result only for even numbers   
+result =[num for num in numbers if num % 2 == 0]
+print(result)
