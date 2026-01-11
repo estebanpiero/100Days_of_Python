@@ -25,7 +25,7 @@ import requests
 import os
 
 OWM_Endpoint = "https://api.openweathermap.org/data/2.5/weather"
-API_KEY = '581590a0c9b977204b5639e573462357'
+API_KEY = ''
 MY_LAT = 41.087  # Your latitude
 MY_LONG = -74.131  # Your longitude
 
