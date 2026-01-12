@@ -1,0 +1,52 @@
+# config.yaml - Configuration file
+
+stocks:
+  - symbol: TSLA
+    company: tesla
+    target: 300.00
+    stop_loss: 200.00
+  
+  - symbol: INTC
+    company: intel
+    target: 50.00
+    stop_loss: 30.00
+  
+  - symbol: AAPL
+    company: apple
+    target: 200.00
+    stop_loss: 150.00
+  
+  - symbol: NVDA
+    company: nvidia
+    target: 150.00
+    stop_loss: 100.00
+  
+  - symbol: FTNT
+    company: fortinet
+    target: 80.00
+    stop_loss: 50.00
+  
+  - symbol: AMD
+    company: amd
+    target: 180.00
+    stop_loss: 120.00
+  
+  - symbol: SPY
+    company: spy
+    target: 500.00
+    stop_loss: 400.00
+
+alerts:
+  threshold: 1.0           # Alert when price changes by more than this %
+  cooldown_hours: 4        # Minimum hours between alerts for same stock
+  channels:
+    - email                # Options: sms, email
+
+api:
+  rate_limit_delay: 12     # Seconds between API calls (5 calls/min)
+  max_retries: 3           # Number of retry attempts
+
+schedule:
+  market_close_check: "16:00"    # Daily check at market close
+  daily_report: "17:00"          # Send daily report
+  chart_generation: "17:30"      # Generate charts
