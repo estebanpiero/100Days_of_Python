@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Update Graph - Pixela Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Update Graph: {{ graph.name }}</h2>
+    <p>Modify your graph settings</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('update_graph_route', graph_id=graph.id) }}">
+        <div class="form-group">
+            <label for="graph_id">Graph ID</label>
+            <input type="text" id="graph_id" value="{{ graph.id }}" disabled>
+            <small>Graph ID cannot be changed</small>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Graph Name *</label>
+            <input type="text" id="name" name="name" value="{{ graph.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="color">Color *</label>
+            <select id="color" name="color" required>
+                {% for value, label in colors %}
+                    <option value="{{ value }}" {% if graph.color == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Note:</strong> You can only update the name and color of a graph. Other properties like unit and type cannot be changed.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Graph</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

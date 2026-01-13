@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Activity - {{ graph.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Manage Activity: {{ graph.name }}</h2>
+    <p>Add, update, or delete activity data</p>
+</div>
+
+<div class="graph-preview-large">
+    <h3>Current Graph</h3>
+    <iframe src="https://pixe.la/v1/users/{{ username }}/graphs/{{ graph.id }}.html"
+            width="100%" height="250" frameborder="0"></iframe>
+    <a href="https://pixe.la/v1/users/{{ username }}/graphs/{{ graph.id }}.html"
+       target="_blank" class="btn btn-secondary">View Full Graph</a>
+</div>
+
+<div class="activity-forms">
+    <!-- Add Activity -->
+    <div class="form-container">
+        <h3>Add Activity</h3>
+        <form method="POST" action="{{ url_for('manage_activity', graph_id=graph.id) }}">
+            <input type="hidden" name="action" value="add">
+
+            <div class="form-group">
+                <label for="add_date">Date *</label>
+                <input type="date" id="add_date" name="date" value="{{ today }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="add_quantity">{{ graph.unit.capitalize() }} *</label>
+                <input type="number" id="add_quantity" name="quantity"
+                       {% if graph.type == 'float' %}step="0.01"{% else %}step="1"{% endif %}
+                       required placeholder="Enter value">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Activity</button>
+        </form>
+    </div>
+
+    <!-- Update Activity -->
+    <div class="form-container">
+        <h3>Update Activity</h3>
+        <form method="POST" action="{{ url_for('manage_activity', graph_id=graph.id) }}">
+            <input type="hidden" name="action" value="update">
+
+            <div class="form-group">
+                <label for="update_date">Date *</label>
+                <input type="date" id="update_date" name="date" value="{{ today }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="update_quantity">New {{ graph.unit.capitalize() }} *</label>
+                <input type="number" id="update_quantity" name="quantity"
+                       {% if graph.type == 'float' %}step="0.01"{% else %}step="1"{% endif %}
+                       required placeholder="Enter new value">
+            </div>
+
+            <button type="submit" class="btn btn-info">Update Activity</button>
+        </form>
+    </div>
+
+    <!-- Delete Activity -->
+    <div class="form-container">
+        <h3>Delete Activity</h3>
+        <form method="POST" action="{{ url_for('manage_activity', graph_id=graph.id) }}"
+              onsubmit="return confirm('Are you sure you want to delete this activity?');">
+            <input type="hidden" name="action" value="delete">
+
+            <div class="form-group">
+                <label for="delete_date">Date *</label>
+                <input type="date" id="delete_date" name="date" value="{{ today }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-danger">Delete Activity</button>
+        </form>
+    </div>
+</div>
+
+<div class="form-actions">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Graphs</a>
+</div>
+
+<div class="info-box">
+    <h4>Activity Tips:</h4>
+    <ul>
+        <li><strong>Add:</strong> Create a new activity entry for a specific date</li>
+        <li><strong>Update:</strong> Modify an existing activity entry</li>
+        <li><strong>Delete:</strong> Remove an activity entry completely</li>
+        <li>You can manage activities for any date, not just today!</li>
+    </ul>
+</div>
+{% endblock %}

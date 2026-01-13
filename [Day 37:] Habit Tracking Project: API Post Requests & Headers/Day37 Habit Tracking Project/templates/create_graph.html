@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Create Graph - Pixela Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Create New Graph</h2>
+    <p>Set up a new habit tracking graph</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('create_graph_route') }}">
+        <div class="form-group">
+            <label for="graph_id">Graph ID *</label>
+            <input type="text" id="graph_id" name="graph_id" required
+                   pattern="[a-z0-9-]+"
+                   title="Use only lowercase letters, numbers, and hyphens"
+                   placeholder="e.g., coding-hours">
+            <small>Use lowercase letters, numbers, and hyphens only</small>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Graph Name *</label>
+            <input type="text" id="name" name="name" required
+                   placeholder="e.g., Daily Coding Hours">
+        </div>
+
+        <div class="form-group">
+            <label for="unit">Unit *</label>
+            <input type="text" id="unit" name="unit" required
+                   placeholder="e.g., hours, pages, km">
+            <small>What are you measuring? (hours, pages, kilometers, etc.)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="type">Type *</label>
+            <select id="type" name="type" required>
+                <option value="int">Integer (whole numbers)</option>
+                <option value="float">Float (decimal numbers)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="color">Color *</label>
+            <select id="color" name="color" required>
+                {% for value, label in colors %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Graph</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="info-box">
+    <h4>Graph Tips:</h4>
+    <ul>
+        <li>Choose a unique Graph ID (you can't change it later)</li>
+        <li>Select 'Integer' for whole numbers (e.g., 1, 2, 3)</li>
+        <li>Select 'Float' for decimal numbers (e.g., 1.5, 2.75)</li>
+        <li>Pick a color that represents your habit!</li>
+    </ul>
+</div>
+{% endblock %}
