@@ -17,9 +17,9 @@ PIXELA_TOKEN = os.getenv('PIXELA_TOKEN')
 USERNAME = os.getenv('USERNAME')
 
 
-#--------------------------------------------------
+#---------------------------------------------------
 # Helper Functions
-#--------------------------------------------------
+#---------------------------------------------------
 
 def get_headers():
     """Return headers with authentication token."""
