@@ -8,6 +8,7 @@ load_dotenv()
 
 APP_ID = os.getenv('APP_ID')
 APP_APIKEY = os.getenv('APP_APIKEY')
+BEARER_TOKEN = os.getenv('BEARER_TOKEN')
 
 GENDER = 'male'
 WEIGHT_KG = 70
@@ -61,7 +62,7 @@ for exercise in result["exercises"]:
 
 
 AUTHORIZATION_HEADER = {
-    'Authorization':'Bearer 12345qwertasdfgzxcvb'
+    'Authorization': BEARER_TOKEN
 }
 
 # SHEETY_ENPOINT = 'https://api.sheety.co/78516c1e802e09608ef62469f95d576f/myWorkoutsTracking/workouts'
