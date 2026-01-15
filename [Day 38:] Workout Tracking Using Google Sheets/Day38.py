@@ -65,7 +65,7 @@ AUTHORIZATION_HEADER = {
     'Authorization': BEARER_TOKEN
 }
 
-# SHEETY_ENPOINT = 'https://api.sheety.co/78516c1e802e09608ef62469f95d576f/myWorkoutsTracking/workouts'
+
 SHEETY_ENPOINT = f'https://api.sheety.co/{USERNAME}/{PROJECT_NAME}/{SHEET}'
 
 
