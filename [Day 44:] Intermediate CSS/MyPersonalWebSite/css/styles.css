@@ -1,0 +1,144 @@
+body{
+    margin: 0;
+    text-align: center;   
+    font-family: 'Merriweather', serif;
+    line-height: 1.42857;
+    color: rgb(84, 84, 84);
+    
+}
+h1{
+    color: #66BFBF;
+    font-family: 'Sacramento', cursive;
+    font-size: 90px;
+    margin: 50px auto 0 auto;
+}
+h2{
+    color: #66BFBF;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: normal;
+}
+h3{
+    color: #11999E;
+    font-family: 'Montserrat', sans-serif;
+    
+}
+p{
+    line-height: 2;
+}
+header{
+    padding: 2em;
+    background: inherit;
+}
+div{
+    display: block;
+}
+ul{
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+/********************************************** <> **********************************************/
+
+.top-container{
+    background-color: #E3FDFD;
+    position: relative;
+    padding-top: 100px;
+}
+.middle-container{
+    margin: 100px 0;
+}
+
+.bottom-container{
+    padding: 50px 0 20px;
+}
+
+.cyber{
+     text-decoration: underline;
+}
+
+.bottom_cloud{
+    position: absolute;
+    left: 400px;
+    bottom: 300px;
+}
+
+.top_cloud{
+    position: absolute;
+    right: 400px;
+    top: 50px;
+}
+
+.profile-pic{
+    border-radius: 100%;
+    height: 200px;
+}
+
+.skill-row{
+    margin: 100px auto 200px auto;
+    width: 50%;
+    text-align: left;
+    line-height: 2;
+}
+
+.skill_image{
+    width: 25%;
+    float: right;
+    margin-left: 30px;
+}
+
+.code_image{
+    width: 25%;
+    float: left;
+    margin-right: 30px;
+}
+
+/******************** Header TOP ***********************/
+.container{
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.nav-top{
+    position: relative;
+    width: 100%;
+
+}
+
+.row{
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.col-xs-4{
+    width: 33.3333%;
+    position: relative;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.col-xs-8{
+    width: 66.6667%;
+    float: left;
+    position: relative;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.nav-list{
+    padding-top: 1.5em;
+    padding-left: 0px;
+    position: relative;
+    float: right;
+}
+.transition{
+    transition: all 0.5s ease-in-out 0s
+}
