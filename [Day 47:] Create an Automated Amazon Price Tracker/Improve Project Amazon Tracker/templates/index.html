@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amazon Price Tracker</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --border:    #2a2d3e;
+      --accent:    #ff9900;
+      --accent2:   #e47911;
+      --text:      #e8eaf0;
+      --muted:     #7a7f99;
+      --green:     #2ecc71;
+      --red:       #e74c3c;
+      --yellow:    #f1c40f;
+      --blue:      #3498db;
+      --radius:    10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header .logo { font-size: 22px; }
+    header h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
+    header .subtitle { color: var(--muted); font-size: 12px; }
+    #status-badge {
+      margin-left: auto;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--border);
+      color: var(--muted);
+      transition: background 0.3s, color 0.3s;
+    }
+    #status-badge.running { background: #1a3a1a; color: var(--green); }
+    #status-badge.stopped { background: var(--border); color: var(--muted); }
+
+    /* ── Layout ───────────────────────────────────────────────────── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      display: grid;
+      gap: 20px;
+    }
+
+    /* ── Card ─────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .card h2 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Add-product form ─────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 800px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 8px 11px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--muted); }
+
+    /* ── Buttons ──────────────────────────────────────────────────── */
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+    .btn-primary  { background: var(--accent); color: #000; }
+    .btn-success  { background: var(--green);  color: #000; }
+    .btn-danger   { background: var(--red);    color: #fff; }
+    .btn-ghost    { background: var(--border); color: var(--text); }
+
+    /* ── Tracker controls ─────────────────────────────────────────── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .interval-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .interval-wrap input {
+      width: 70px;
+      text-align: center;
+    }
+
+    /* ── Products table ───────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    td { padding: 10px 12px; vertical-align: middle; }
+
+    .product-name { font-weight: 600; }
+    .product-url a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 11px;
+      word-break: break-all;
+    }
+    .product-url a:hover { text-decoration: underline; }
+
+    .price-cell { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pending  { background: #1e2030; color: var(--muted); }
+    .status-above    { background: #1a2233; color: var(--blue); }
+    .status-below    { background: #1a3a1a; color: var(--green); }
+    .status-error    { background: #3a1a1a; color: var(--red); }
+    .status-checking { background: #2a2010; color: var(--yellow); }
+
+    .price-below { color: var(--green); }
+    .price-above { color: var(--text); }
+
+    /* ── Inline price editor ──────────────────────────────────────── */
+    .target-cell { display: flex; align-items: center; gap: 6px; }
+    .target-cell input {
+      width: 80px;
+      padding: 4px 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background 0.15s;
+      line-height: 1;
+    }
+    .btn-icon:hover { background: var(--border); }
+    .btn-icon.save  { color: var(--green); }
+    .btn-icon.cancel { color: var(--muted); }
+
+    #empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px;
+    }
+
+    /* ── Live log ─────────────────────────────────────────────────── */
+    #log {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      height: 180px;
+      overflow-y: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .log-line { display: flex; gap: 10px; }
+    .log-time { color: var(--muted); flex-shrink: 0; }
+    .log-text { color: var(--text); }
+    .log-text.success { color: var(--green); }
+    .log-text.warning { color: var(--yellow); }
+    .log-text.error   { color: var(--red); }
+
+    /* ── Toast ────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok  { border-color: var(--green); color: var(--green); }
+    #toast.err { border-color: var(--red);   color: var(--red); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">📦</span>
+  <div>
+    <h1>Amazon Price Tracker</h1>
+    <div class="subtitle">Real-time price monitoring with email alerts</div>
+  </div>
+  <div id="status-badge" class="stopped">● Stopped</div>
+</header>
+
+<main>
+
+  <!-- Add product -------------------------------------------------- -->
+  <div class="card">
+    <h2>Add Product to Track</h2>
+    <div class="form-grid">
+      <label>
+        Amazon URL *
+        <input id="f-url" type="url" placeholder="https://www.amazon.com/dp/…" />
+      </label>
+      <label>
+        Product Name
+        <input id="f-name" type="text" placeholder="e.g. Mac Mini" />
+      </label>
+      <label>
+        Target Price ($) *
+        <input id="f-price" type="number" min="0" step="0.01" placeholder="e.g. 499.99" />
+      </label>
+      <label>
+        Notify Email *
+        <input id="f-email" type="email" placeholder="you@example.com" />
+      </label>
+    </div>
+    <div style="margin-top: 14px;">
+      <button class="btn btn-primary" onclick="addProduct()">+ Add Product</button>
+    </div>
+  </div>
+
+  <!-- Tracked products --------------------------------------------- -->
+  <div class="card">
+    <h2>Tracked Products</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>URL</th>
+            <th>Current Price</th>
+            <th>Target Price</th>
+            <th>Status</th>
+            <th>Last Checked</th>
+            <th>Notify</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="products-body">
+          <tr id="empty-row"><td colspan="8">No products added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Controls ----------------------------------------------------- -->
+  <div class="card">
+    <h2>Tracker Controls</h2>
+    <div class="controls">
+      <button id="btn-start" class="btn btn-success" onclick="startTracker()">▶ Start Tracking</button>
+      <button id="btn-stop"  class="btn btn-danger"  onclick="stopTracker()" disabled>■ Stop Tracking</button>
+      <div class="interval-wrap">
+        Check every
+        <input id="interval" type="number" min="10" max="3600" value="60" />
+        seconds
+      </div>
+    </div>
+  </div>
+
+  <!-- Live log ----------------------------------------------------- -->
+  <div class="card">
+    <h2>Live Log</h2>
+    <div id="log"></div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────
+  const products = {};   // id → product object
+
+  // ── SSE connection ─────────────────────────────────────────────────
+  const evtSource = new EventSource('/stream');
+
+  evtSource.onmessage = (e) => {
+    const { type, data } = JSON.parse(e.data);
+
+    if (type === 'init') {
+      data.products.forEach(upsertProduct);
+      setTrackerState(data.running);
+    } else if (type === 'product_added') {
+      upsertProduct(data);
+    } else if (type === 'product_update') {
+      upsertProduct(data);
+    } else if (type === 'product_removed') {
+      deleteProduct(data.id);
+    } else if (type === 'log') {
+      appendLog(data.time, data.text);
+    } else if (type === 'status') {
+      setTrackerState(data === 'running');
+    }
+    // 'ping' is ignored — just keeps the connection alive
+  };
+
+  evtSource.onerror = () => appendLog('--:--:--', 'Connection lost — reload page to reconnect.', 'error');
+
+  // ── Render helpers ─────────────────────────────────────────────────
+  function upsertProduct(p) {
+    products[p.id] = p;
+    renderProducts();
+  }
+
+  function deleteProduct(id) {
+    delete products[id];
+    renderProducts();
+  }
+
+  function renderProducts() {
+    const tbody = document.getElementById('products-body');
+    const ids = Object.keys(products);
+
+    if (ids.length === 0) {
+      tbody.innerHTML = '<tr id="empty-row"><td colspan="8">No products added yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = ids.map(id => {
+      const p = products[id];
+      const currDisplay = p.current_price != null
+        ? `<span class="price-cell ${p.status === 'below' ? 'price-below' : 'price-above'}">$${p.current_price.toFixed(2)}</span>`
+        : '<span style="color:var(--muted)">—</span>';
+
+      const statusMap = {
+        pending:  ['pending',  'Pending'],
+        above:    ['above',    'Above target'],
+        below:    ['below',    '✓ Below target'],
+        error:    ['error',    'Error'],
+        checking: ['checking', 'Checking…'],
+      };
+      const [cls, label] = statusMap[p.status] || ['pending', p.status];
+
+      const shortUrl = p.url.replace(/https?:\/\/(www\.)?amazon\.com/, 'amazon.com');
+
+      return `
+        <tr id="row-${p.id}">
+          <td class="product-name">${esc(p.name)}</td>
+          <td class="product-url"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(shortUrl.slice(0, 45))}…</a></td>
+          <td>${currDisplay}</td>
+          <td id="target-cell-${p.id}">
+            <div class="target-cell">
+              <span class="price-cell">$${p.target_price.toFixed(2)}</span>
+              <button class="btn-icon" title="Edit target price" onclick="startEditTarget('${p.id}', ${p.target_price})">✏️</button>
+            </div>
+          </td>
+          <td><span class="status-pill status-${cls}">${label}</span></td>
+          <td style="color:var(--muted)">${p.last_checked || '—'}</td>
+          <td style="color:var(--muted);font-size:12px">${esc(p.notify_email)}</td>
+          <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="removeProduct('${p.id}')">Remove</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function appendLog(time, text, cls = '') {
+    const flavor = text.includes('BELOW') || text.includes('sent') ? 'success'
+                 : text.includes('Error') || text.includes('error') || text.includes('failed') ? 'error'
+                 : text.includes('…') || text.includes('Checking') ? 'warning'
+                 : '';
+    const log = document.getElementById('log');
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML = `<span class="log-time">${time}</span><span class="log-text ${cls || flavor}">${esc(text)}</span>`;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setTrackerState(running) {
+    const badge = document.getElementById('status-badge');
+    const btnStart = document.getElementById('btn-start');
+    const btnStop  = document.getElementById('btn-stop');
+    badge.className = running ? 'running' : 'stopped';
+    badge.textContent = running ? '● Running' : '● Stopped';
+    btnStart.disabled = running;
+    btnStop.disabled  = !running;
+  }
+
+  // ── API calls ──────────────────────────────────────────────────────
+  async function addProduct() {
+    const url   = document.getElementById('f-url').value.trim();
+    const name  = document.getElementById('f-name').value.trim();
+    const price = document.getElementById('f-price').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+
+    if (!url || !price || !email) {
+      toast('URL, target price, and email are required.', 'err');
+      return;
+    }
+
+    const res = await fetch('/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, name, target_price: price, notify_email: email }),
+    });
+
+    if (res.ok) {
+      toast('Product added!', 'ok');
+      document.getElementById('f-url').value   = '';
+      document.getElementById('f-name').value  = '';
+      document.getElementById('f-price').value = '';
+      // keep email pre-filled for convenience
+    } else {
+      const err = await res.json();
+      toast(err.error || 'Failed to add product.', 'err');
+    }
+  }
+
+  async function removeProduct(id) {
+    await fetch(`/products/${id}`, { method: 'DELETE' });
+  }
+
+  function startEditTarget(id, currentPrice) {
+    const cell = document.getElementById(`target-cell-${id}`);
+    if (!cell) return;
+    cell.innerHTML = `
+      <div class="target-cell">
+        <input id="edit-price-${id}" type="number" min="0" step="0.01" value="${currentPrice}" />
+        <button class="btn-icon save"   title="Save"   onclick="saveTarget('${id}')">✔</button>
+        <button class="btn-icon cancel" title="Cancel" onclick="cancelEditTarget('${id}', ${currentPrice})">✖</button>
+      </div>`;
+    const inp = document.getElementById(`edit-price-${id}`);
+    inp.focus();
+    inp.select();
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  saveTarget(id);
+      if (e.key === 'Escape') cancelEditTarget(id, currentPrice);
+    });
+  }
+
+  function cancelEditTarget(id, originalPrice) {
+    const cell = document.getElementById(`target-cell-${id}`);
+    if (!cell) return;
+    cell.innerHTML = `
+      <div class="target-cell">
+        <span class="price-cell">$${originalPrice.toFixed(2)}</span>
+        <button class="btn-icon" title="Edit target price" onclick="startEditTarget('${id}', ${originalPrice})">✏️</button>
+      </div>`;
+  }
+
+  async function saveTarget(id) {
+    const inp = document.getElementById(`edit-price-${id}`);
+    if (!inp) return;
+    const newPrice = parseFloat(inp.value);
+    if (isNaN(newPrice) || newPrice <= 0) {
+      toast('Enter a valid price greater than 0.', 'err');
+      return;
+    }
+    const res = await fetch(`/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_price: newPrice }),
+    });
+    if (res.ok) {
+      toast('Target price updated!', 'ok');
+      // renderProducts() will be triggered by the SSE product_update event
+    } else {
+      const err = await res.json();
+      toast(err.error || 'Update failed.', 'err');
+    }
+  }
+
+  async function startTracker() {
+    const interval = parseInt(document.getElementById('interval').value, 10) || 60;
+    const res = await fetch('/tracker/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interval }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      toast(err.error || 'Could not start tracker.', 'err');
+    }
+  }
+
+  async function stopTracker() {
+    await fetch('/tracker/stop', { method: 'POST' });
+  }
+
+  // ── Allow Enter key to submit form ────────────────────────────────
+  ['f-url','f-name','f-price','f-email'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') addProduct();
+    });
+  });
+
+  // ── Toast ──────────────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg, cls = 'ok') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `show ${cls}`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+  }
+
+  // ── Utility ────────────────────────────────────────────────────────
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+</body>
+</html>
